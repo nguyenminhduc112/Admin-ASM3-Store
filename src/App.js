@@ -1,24 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import RootPage, { loaderRoot } from "./pages/RootPage";
+import DashboardPage from "./pages/DashboardPage";
+import { loaderLogin } from "./pages/LoginPage.jsx";
+import { loaderProductPage } from "./pages/ProductPage.jsx";
 
+import { lazy, Suspense } from "react";
+
+
+const LoginPage = lazy(() => import('./pages/LoginPage.jsx'))
+const ProductPage = lazy(() => import('./pages/ProductPage.jsx'))
+
+const routers = createBrowserRouter([
+  {
+    path: '/', element: <RootPage />, loader: loaderRoot, children: [
+      {
+        index: true,
+        element: <DashboardPage />
+      },
+      {
+        path: "products",
+        element: <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}><ProductPage /></Suspense>,
+        loader: loaderProductPage
+      },
+    ]
+  },
+  {
+    path: '/login',
+    element: <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}><LoginPage /></Suspense>,
+    loader: loaderLogin
+  },
+])
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <RouterProvider router={routers} />
   );
 }
 
